@@ -1,0 +1,21 @@
+{
+  "bundles": [
+    {
+      "name": "all",
+      "assets": [
+        {
+          "name": "BG_TITLE",
+          "srcs": "asset/bg/title.png"
+        },
+        {
+          "name": "BG_FIELDS",
+          "srcs": "asset/bg/fields.png"
+        },
+        {
+          "name": "MOB_GOBLIN",
+          "srcs": "asset/mob/goblin.png"
+        }
+      ]
+    }
+  ]
+}
