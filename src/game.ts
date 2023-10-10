@@ -4,24 +4,21 @@ import { sound } from "@pixi/sound";
 import {
   WIDTH,
   HEIGHT,
-  FONT,
   MANIFEST_JSON_PATH,
   MAX_SCALE,
   FONT_BOLD,
+  TEXT_STYLE,
 } from "./constant";
-import { InputKey, InputState } from "./input";
+import ActionMenu from "./component/ActionMenu";
+import EnemyContainer from "./component/EnemyContainer";
+import UiBox from "./component/UiBox";
 import { MOB_INFO, Mob } from "./data/mob";
+import { InputKey, InputState } from "./input";
 
 export enum GameState {
   TITLE,
   GAME,
 }
-
-const ENEMY_NAME_STYLE = new PIXI.TextStyle({
-  fill: "#fefefe",
-  fontFamily: FONT,
-  fontSize: 10,
-});
 
 export class Game {
   app: PIXI.Application;
@@ -31,6 +28,7 @@ export class Game {
   state: GameState;
   timers: any[];
   bgm?: string;
+  actionMenu?: ActionMenu;
 
   // game state
   bg?: string;
@@ -142,7 +140,10 @@ export class Game {
     if (!this.bgm) {
       return;
     }
-    sound.play(this.bgm, this.playBgm.bind(this));
+    sound.play(this.bgm, {
+      volume: 0.3,
+      complete: this.playBgm.bind(this),
+    });
   }
 
   async start() {
@@ -160,6 +161,28 @@ export class Game {
           this.select(GameState.GAME);
         }
         break;
+      case GameState.GAME:
+        const oldCursorIndex = this.actionMenu?.cursorIndex || 0;
+        if (this.input.isPressed(InputKey.LEFT) && this.actionMenu) {
+          this.actionMenu.setCursorIndex(
+            [0, 1, 0, 1][this.actionMenu.cursorIndex]
+          );
+        } else if (this.input.isPressed(InputKey.RIGHT) && this.actionMenu) {
+          this.actionMenu.setCursorIndex(
+            [2, 3, 2, 3][this.actionMenu.cursorIndex]
+          );
+        } else if (this.input.isPressed(InputKey.UP) && this.actionMenu) {
+          this.actionMenu.setCursorIndex(
+            [0, 0, 2, 2][this.actionMenu.cursorIndex]
+          );
+        } else if (this.input.isPressed(InputKey.DOWN) && this.actionMenu) {
+          this.actionMenu.setCursorIndex(
+            [1, 1, 3, 3][this.actionMenu.cursorIndex]
+          );
+        }
+        if (oldCursorIndex !== this.actionMenu?.cursorIndex) {
+          sound.play("SFX_menu_move");
+        }
     }
   }
 
@@ -168,66 +191,31 @@ export class Game {
     this.screen.addChild(bg);
 
     // Draw enemy name
-    const enemyNameX = (WIDTH - 80) / 2;
-    const enemyNameY = 60;
-    const enemyNameBg = box(enemyNameX, enemyNameY, 80, 15);
-    const enemyName = new PIXI.Text(this.enemy.info.name, ENEMY_NAME_STYLE);
+    const enemyNameBg = new UiBox(80, 15);
+    enemyNameBg.x = (WIDTH - 80) / 2;
+    enemyNameBg.y = 60;
+    const enemyName = new PIXI.Text(this.enemy.info.name, TEXT_STYLE);
     enemyName.x = 4;
     enemyName.y = 3;
     enemyNameBg.addChild(enemyName);
     this.screen.addChild(enemyNameBg);
 
     // Draw enemy
-    const enemyX = enemyNameX;
-    const enemyY = 80;
-
-    const enemyBox = box(enemyX, enemyY, 80, 90);
-    const enemySprite = new PIXI.Sprite(this.assets[this.enemy.info.assetId]);
-    enemySprite.x = 8;
-    enemySprite.y = 8;
-    enemyBox.addChild(enemySprite);
-
-    const enemyHealth = new PIXI.Graphics();
-    enemyHealth.x = 8;
-    enemyHealth.y = 8 + 64 + 8;
-    enemyHealth.lineStyle(2, "#ff4757");
-    enemyHealth.lineTo(
-      Math.floor(64 * (this.enemy.curHp / this.enemy.stats.maxHp)),
-      0
+    const enemyBox = new EnemyContainer(
+      this.enemy,
+      this.assets[this.enemy.info.assetId]
     );
-    enemyBox.addChild(enemyHealth);
-
-    const enemyMana = new PIXI.Graphics();
-    enemyMana.x = 8;
-    enemyMana.y = 8 + 64 + 8 + 3;
-    enemyMana.lineStyle(2, "#3742fa");
-    const manaLength =
-      this.enemy.stats.maxMp > 0
-        ? Math.floor(64 * (this.enemy.curMp / this.enemy.stats.maxMp))
-        : 64;
-    enemyMana.lineTo(manaLength, 0);
-    enemyBox.addChild(enemyMana);
-
+    enemyBox.x = enemyNameBg.x;
+    enemyBox.y = 80;
     this.screen.addChild(enemyBox);
+
+    // Draw menu
+    this.actionMenu = new ActionMenu();
+    this.actionMenu.x = 98;
+    this.actionMenu.y = enemyBox.y + 100;
+    this.screen.addChild(this.actionMenu);
   }
 }
-
-const box = (x: number, y: number, w: number, h: number, r: number = 4) => {
-  const g = new PIXI.Graphics();
-  g.beginFill("#242424");
-  g.drawRoundedRect(0, 0, w, h, r);
-  g.lineStyle(1, "#fefefe");
-  g.drawRoundedRect(1, 1, w - 2, h - 2, r);
-  g.endFill();
-
-  const container = new PIXI.Container();
-  container.x = x;
-  container.y = y;
-
-  container.addChild(g);
-
-  return container;
-};
 
 export const createGame = async () => {
   const app = new PIXI.Application({
@@ -240,6 +228,8 @@ export const createGame = async () => {
   });
 
   sound.add("BGM_title", "asset/bgm/title.ogg");
+  sound.add("SFX_menu_move", "asset/sfx/menu-move.ogg");
+  sound.add("SFX_menu_select", "asset/sfx/menu-select.ogg");
 
   await PIXI.Assets.init({ manifest: MANIFEST_JSON_PATH });
   return new Game(app, await PIXI.Assets.loadBundle("all"));

@@ -60,7 +60,6 @@ export class InputState {
     if (typeof key === "undefined") {
       return;
     }
-    console.log(key);
     this.keys.add(key);
   }
 
