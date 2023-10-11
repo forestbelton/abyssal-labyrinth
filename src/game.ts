@@ -9,11 +9,14 @@ import {
   FONT_BOLD,
   TEXT_STYLE,
 } from "./constant";
-import ActionMenu from "./component/ActionMenu";
+import ActionMenu, { ActionMenuItem } from "./component/ActionMenu";
 import EnemyContainer from "./component/EnemyContainer";
 import UiBox from "./component/UiBox";
 import { MOB_INFO, Mob } from "./data/mob";
 import { InputKey, InputState } from "./input";
+import IMenu from "./component/menu/IMenu";
+import ItemMenu from "./component/menu/ItemMenu";
+import { ItemInventory } from "./data/item";
 
 export enum GameState {
   TITLE,
@@ -29,10 +32,12 @@ export class Game {
   timers: any[];
   bgm?: string;
   actionMenu?: ActionMenu;
+  subMenu?: IMenu;
 
   // game state
   bg?: string;
   player?: any;
+  playerItems: ItemInventory;
   enemy?: any;
 
   constructor(app: PIXI.Application, assets: Record<string, any>) {
@@ -43,6 +48,8 @@ export class Game {
 
     this.screen = new PIXI.Container();
     this.app.stage.addChild(this.screen);
+
+    this.playerItems = {};
 
     this.state = GameState.TITLE;
     this.select(GameState.TITLE);
@@ -123,12 +130,13 @@ export class Game {
         );
 
         this.bgm = "BGM_title";
-        this.playBgm();
+        this.playBgm("BGM_title");
         break;
       case GameState.GAME:
         // TODO: randomly select?
         this.bg = "FIELDS";
-        this.enemy = new Mob(MOB_INFO["Goblin"]);
+        this.enemy = new Mob(MOB_INFO["Rat"]);
+        this.playBgm("BGM_battle");
         this.startBattle();
         break;
     }
@@ -136,13 +144,18 @@ export class Game {
     this.state = state;
   }
 
-  playBgm() {
+  playBgm(bgm: string) {
+    if (this.bgm) {
+      sound.stop(this.bgm);
+    }
+
+    this.bgm = bgm;
     if (!this.bgm) {
       return;
     }
     sound.play(this.bgm, {
       volume: 0.3,
-      complete: this.playBgm.bind(this),
+      complete: () => this.playBgm(bgm),
     });
   }
 
@@ -162,26 +175,24 @@ export class Game {
         }
         break;
       case GameState.GAME:
-        const oldCursorIndex = this.actionMenu?.cursorIndex || 0;
-        if (this.input.isPressed(InputKey.LEFT) && this.actionMenu) {
-          this.actionMenu.setCursorIndex(
-            [0, 1, 0, 1][this.actionMenu.cursorIndex]
-          );
-        } else if (this.input.isPressed(InputKey.RIGHT) && this.actionMenu) {
-          this.actionMenu.setCursorIndex(
-            [2, 3, 2, 3][this.actionMenu.cursorIndex]
-          );
-        } else if (this.input.isPressed(InputKey.UP) && this.actionMenu) {
-          this.actionMenu.setCursorIndex(
-            [0, 0, 2, 2][this.actionMenu.cursorIndex]
-          );
-        } else if (this.input.isPressed(InputKey.DOWN) && this.actionMenu) {
-          this.actionMenu.setCursorIndex(
-            [1, 1, 3, 3][this.actionMenu.cursorIndex]
-          );
+        if (this.subMenu) {
+          this.subMenu.update(this.input);
         }
-        if (oldCursorIndex !== this.actionMenu?.cursorIndex) {
-          sound.play("SFX_menu_move");
+
+        const item = this.actionMenu?.update(this.input);
+        switch (item) {
+          case ActionMenuItem.ATTACK:
+            break;
+          case ActionMenuItem.CAST:
+            break;
+          case ActionMenuItem.ITEM:
+            if (this.actionMenu) {
+              this.screen.removeChild(this.actionMenu);
+            }
+            this.subMenu = new ItemMenu(this.playerItems);
+            this.subMenu.x = 10;
+            this.subMenu.y = this.actionMenu?.y || 0;
+            this.screen.addChild(this.subMenu);
         }
     }
   }
@@ -228,6 +239,7 @@ export const createGame = async () => {
   });
 
   sound.add("BGM_title", "asset/bgm/title.ogg");
+  sound.add("BGM_battle", "asset/bgm/battle.ogg");
   sound.add("SFX_menu_move", "asset/sfx/menu-move.ogg");
   sound.add("SFX_menu_select", "asset/sfx/menu-select.ogg");
 

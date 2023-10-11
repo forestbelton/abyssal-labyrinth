@@ -34,10 +34,22 @@ export const MOB_INFO: Record<string, MobInfo> = {
     stats: {
       maxHp: 8,
       maxMp: 0,
-      strength: 1,
+      strength: 2,
       intelligence: 0,
       vitality: 1,
       agility: 2,
+    },
+  },
+  Rat: {
+    assetId: "MOB_RAT",
+    name: "Rat",
+    stats: {
+      maxHp: 5,
+      maxMp: 0,
+      strength: 1,
+      intelligence: 0,
+      vitality: 1,
+      agility: 3,
     },
   },
 };

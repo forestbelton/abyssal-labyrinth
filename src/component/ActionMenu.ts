@@ -1,7 +1,16 @@
 import * as PIXI from "pixi.js";
+import { sound } from "@pixi/sound";
 
 import UiBox from "./UiBox";
 import { TEXT_STYLE } from "../constant";
+import { InputKey, InputState } from "../input";
+
+export enum ActionMenuItem {
+  ATTACK = "ATTACK",
+  ITEM = "ITEM",
+  CAST = "CAST",
+  FLEE = "FLEE",
+}
 
 export default class ActionMenu extends UiBox {
   cursorText: PIXI.Text;
@@ -46,5 +55,33 @@ export default class ActionMenu extends UiBox {
   setCursorIndex(cursorIndex: number) {
     this.cursorIndex = cursorIndex;
     this.moveCursor();
+  }
+
+  update(input: InputState): ActionMenuItem | null {
+    if (input.isPressed(InputKey.SELECT)) {
+      sound.play("SFX_menu_select");
+      return [
+        ActionMenuItem.ATTACK,
+        ActionMenuItem.ITEM,
+        ActionMenuItem.CAST,
+        ActionMenuItem.FLEE,
+      ][this.cursorIndex];
+    }
+
+    const oldCursorIndex = this.cursorIndex || 0;
+    if (input.isPressed(InputKey.LEFT)) {
+      this.setCursorIndex([0, 1, 0, 1][this.cursorIndex]);
+    } else if (input.isPressed(InputKey.RIGHT)) {
+      this.setCursorIndex([2, 3, 2, 3][this.cursorIndex]);
+    } else if (input.isPressed(InputKey.UP)) {
+      this.setCursorIndex([0, 0, 2, 2][this.cursorIndex]);
+    } else if (input.isPressed(InputKey.DOWN)) {
+      this.setCursorIndex([1, 1, 3, 3][this.cursorIndex]);
+    }
+    if (oldCursorIndex !== this.cursorIndex) {
+      sound.play("SFX_menu_move");
+    }
+
+    return null;
   }
 }
