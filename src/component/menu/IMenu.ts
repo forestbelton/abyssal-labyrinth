@@ -1,6 +1,6 @@
-import { InputState } from "../../input";
+import { Game } from "../../game";
 import UiBox from "../UiBox";
 
 export default interface IMenu extends UiBox {
-  update(input: InputState): void;
+  update(game: Game): void;
 }

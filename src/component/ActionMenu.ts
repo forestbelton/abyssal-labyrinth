@@ -3,16 +3,12 @@ import { sound } from "@pixi/sound";
 
 import UiBox from "./UiBox";
 import { TEXT_STYLE } from "../constant";
-import { InputKey, InputState } from "../input";
+import { InputKey } from "../input";
+import { Game } from "../game";
+import ItemMenu from "./menu/ItemMenu";
+import IMenu from "./menu/IMenu";
 
-export enum ActionMenuItem {
-  ATTACK = "ATTACK",
-  ITEM = "ITEM",
-  CAST = "CAST",
-  FLEE = "FLEE",
-}
-
-export default class ActionMenu extends UiBox {
+export default class ActionMenu extends UiBox implements IMenu {
   cursorText: PIXI.Text;
   cursorIndex: number;
 
@@ -57,31 +53,45 @@ export default class ActionMenu extends UiBox {
     this.moveCursor();
   }
 
-  update(input: InputState): ActionMenuItem | null {
-    if (input.isPressed(InputKey.SELECT)) {
+  update(game: Game) {
+    if (game.input.isPressed(InputKey.SELECT)) {
       sound.play("SFX_menu_select");
-      return [
-        ActionMenuItem.ATTACK,
-        ActionMenuItem.ITEM,
-        ActionMenuItem.CAST,
-        ActionMenuItem.FLEE,
-      ][this.cursorIndex];
+      switch (this.cursorIndex) {
+        // ATTACK
+        case 0:
+          break;
+        // ITEM
+        case 1:
+          if (game.actionMenu) {
+            game.screen.removeChild(game.actionMenu);
+          }
+          game.subMenu = new ItemMenu(game.playerItems);
+          game.subMenu.x = 10;
+          game.subMenu.y = game.actionMenu?.y || 0;
+          game.screen.addChild(game.subMenu);
+          break;
+        // CAST
+        case 2:
+          break;
+        // FLEE
+        case 3:
+          break;
+      }
+      return;
     }
 
     const oldCursorIndex = this.cursorIndex || 0;
-    if (input.isPressed(InputKey.LEFT)) {
+    if (game.input.isPressed(InputKey.LEFT)) {
       this.setCursorIndex([0, 1, 0, 1][this.cursorIndex]);
-    } else if (input.isPressed(InputKey.RIGHT)) {
+    } else if (game.input.isPressed(InputKey.RIGHT)) {
       this.setCursorIndex([2, 3, 2, 3][this.cursorIndex]);
-    } else if (input.isPressed(InputKey.UP)) {
+    } else if (game.input.isPressed(InputKey.UP)) {
       this.setCursorIndex([0, 0, 2, 2][this.cursorIndex]);
-    } else if (input.isPressed(InputKey.DOWN)) {
+    } else if (game.input.isPressed(InputKey.DOWN)) {
       this.setCursorIndex([1, 1, 3, 3][this.cursorIndex]);
     }
     if (oldCursorIndex !== this.cursorIndex) {
       sound.play("SFX_menu_move");
     }
-
-    return null;
   }
 }

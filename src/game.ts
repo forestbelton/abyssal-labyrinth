@@ -9,13 +9,12 @@ import {
   FONT_BOLD,
   TEXT_STYLE,
 } from "./constant";
-import ActionMenu, { ActionMenuItem } from "./component/ActionMenu";
+import ActionMenu from "./component/ActionMenu";
 import EnemyContainer from "./component/EnemyContainer";
 import UiBox from "./component/UiBox";
 import { MOB_INFO, Mob } from "./data/mob";
 import { InputKey, InputState } from "./input";
 import IMenu from "./component/menu/IMenu";
-import ItemMenu from "./component/menu/ItemMenu";
 import { ItemInventory } from "./data/item";
 
 export enum GameState {
@@ -32,7 +31,7 @@ export class Game {
   timers: any[];
   bgm?: string;
   actionMenu?: ActionMenu;
-  subMenu?: IMenu;
+  subMenu: IMenu | null;
 
   // game state
   bg?: string;
@@ -45,11 +44,17 @@ export class Game {
     this.assets = assets;
     this.input = new InputState();
     this.timers = [];
+    this.subMenu = null;
 
     this.screen = new PIXI.Container();
     this.app.stage.addChild(this.screen);
 
-    this.playerItems = {};
+    this.playerItems = {
+      RedPotion: 2,
+      BluPotion: 3,
+      YelPotion: 5,
+      OraPotion: 7,
+    };
 
     this.state = GameState.TITLE;
     this.select(GameState.TITLE);
@@ -176,24 +181,9 @@ export class Game {
         break;
       case GameState.GAME:
         if (this.subMenu) {
-          this.subMenu.update(this.input);
+          this.subMenu.update(this);
         }
-
-        const item = this.actionMenu?.update(this.input);
-        switch (item) {
-          case ActionMenuItem.ATTACK:
-            break;
-          case ActionMenuItem.CAST:
-            break;
-          case ActionMenuItem.ITEM:
-            if (this.actionMenu) {
-              this.screen.removeChild(this.actionMenu);
-            }
-            this.subMenu = new ItemMenu(this.playerItems);
-            this.subMenu.x = 10;
-            this.subMenu.y = this.actionMenu?.y || 0;
-            this.screen.addChild(this.subMenu);
-        }
+        this.actionMenu?.update(this);
     }
   }
 
