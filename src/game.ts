@@ -50,10 +50,20 @@ export class Game {
     this.app.stage.addChild(this.screen);
 
     this.playerItems = {
-      RedPotion: 2,
-      BluPotion: 3,
-      YelPotion: 5,
-      OraPotion: 7,
+      "Red Potn": 99,
+      "Ora Potn": 99,
+      "Yel Potn": 99,
+      "Blu Potn": 99,
+      "Red Mush": 99,
+      "Ora Mush": 99,
+      "Yel Mush": 99,
+      "Blu Mush": 99,
+      BroSword: 99,
+      IroSword: 99,
+      MitSword: 99,
+      AdaSword: 99,
+      RunSword: 99,
+      DrgSword: 99,
     };
 
     this.state = GameState.TITLE;
@@ -182,6 +192,7 @@ export class Game {
       case GameState.GAME:
         if (this.subMenu) {
           this.subMenu.update(this);
+          return;
         }
         this.actionMenu?.update(this);
     }

@@ -55,6 +55,8 @@ export default class ActionMenu extends UiBox implements IMenu {
 
   update(game: Game) {
     if (game.input.isPressed(InputKey.SELECT)) {
+      console.log("BAZONGA!!!");
+
       sound.play("SFX_menu_select");
       switch (this.cursorIndex) {
         // ATTACK

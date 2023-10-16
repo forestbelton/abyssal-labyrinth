@@ -14,3 +14,5 @@ export const TEXT_STYLE = new TextStyle({
   fontFamily: FONT,
   fontSize: 10,
 });
+
+export const MAX_ITEMNAME_LENGTH = 8;
