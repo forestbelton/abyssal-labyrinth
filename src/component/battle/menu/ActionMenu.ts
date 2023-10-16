@@ -1,13 +1,13 @@
 import * as PIXI from "pixi.js";
 import { sound } from "@pixi/sound";
 
-import UiBox from "./UiBox";
-import { TEXT_STYLE } from "../constant";
-import { InputKey } from "../input";
-import { Game } from "../game";
-import ItemMenu from "./menu/ItemMenu";
-import IMenu from "./menu/IMenu";
-import SpellMenu from "./menu/SpellMenu";
+import UiBox from "../../util/UiBox";
+import { TEXT_STYLE } from "../../../constant";
+import { InputKey } from "../../../input";
+import { Game } from "../../../game";
+import ItemMenu from "./ItemMenu";
+import IMenu from "../../util/IMenu";
+import SpellMenu from "./SpellMenu";
 
 export default class ActionMenu extends UiBox implements IMenu {
   cursorText: PIXI.Text;

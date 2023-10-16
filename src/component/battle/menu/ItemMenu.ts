@@ -1,23 +1,20 @@
 import * as PIXI from "pixi.js";
 import { sound } from "@pixi/sound";
 
-import { MAX_ITEMNAME_LENGTH, TEXT_STYLE, WIDTH } from "../../constant";
-import { InputKey } from "../../input";
-import IMenu from "./IMenu";
-import UiBox from "../UiBox";
-import { Game } from "../../game";
-import { SPELL_INFO, SpellName } from "../../data/spell";
-import { PlayerSpells } from "../../data/player";
+import { MAX_ITEMNAME_LENGTH, TEXT_STYLE, WIDTH } from "../../../constant";
+import { InputKey } from "../../../input";
+import IMenu from "../../util/IMenu";
+import UiBox from "../../util/UiBox";
+import { Game } from "../../../game";
+import { PlayerInventory } from "../../../data/player";
 
-type SpellEntry = SpellName | null;
+type ItemEntry = [string, number] | null;
 
-type SpellEntryRow = [SpellEntry, SpellEntry, SpellEntry];
+type ItemEntryRow = [ItemEntry, ItemEntry, ItemEntry];
 
-const SPELLS_PER_ROW = 3;
-
-export default class SpellMenu extends UiBox implements IMenu {
-  spellEntries: SpellEntryRow[];
-  spellEntrySprites: PIXI.Text[];
+export default class ItemMenu extends UiBox implements IMenu {
+  itemEntries: ItemEntryRow[];
+  itemEntrySprites: PIXI.Text[];
   cursorState: {
     text: PIXI.Text;
     x: number;
@@ -25,17 +22,18 @@ export default class SpellMenu extends UiBox implements IMenu {
     rowIndex: number;
   } | null;
 
-  constructor(spells: PlayerSpells) {
+  constructor(items: PlayerInventory) {
     super(WIDTH - 20, 55);
 
-    this.spellEntrySprites = [];
+    this.itemEntrySprites = [];
 
-    if (spells.size === 0) {
-      const text = new PIXI.Text("No spells.", TEXT_STYLE);
+    const numItems = Object.keys(items).length;
+    if (numItems === 0) {
+      const text = new PIXI.Text("No items.", TEXT_STYLE);
       text.x = 8;
       text.y = 8;
       this.addChild(text);
-      this.spellEntries = [];
+      this.itemEntries = [];
       this.cursorState = null;
       return;
     }
@@ -52,11 +50,11 @@ export default class SpellMenu extends UiBox implements IMenu {
       y: 0,
     };
 
-    const entries: SpellEntryRow[] = [];
-    let row: SpellEntryRow = [null, null, null];
+    const entries: ItemEntryRow[] = [];
+    let row: ItemEntryRow = [null, null, null];
     let rowIndex = 0;
-    for (let spellName of spells) {
-      row[rowIndex++] = spellName;
+    for (let entry of Object.entries(items)) {
+      row[rowIndex++] = entry;
       if (rowIndex >= row.length) {
         entries.push(row);
         row = [null, null, null];
@@ -66,7 +64,7 @@ export default class SpellMenu extends UiBox implements IMenu {
     if (rowIndex > 0) {
       entries.push(row);
     }
-    this.spellEntries = entries;
+    this.itemEntries = entries;
 
     this.renderEntries();
   }
@@ -76,44 +74,36 @@ export default class SpellMenu extends UiBox implements IMenu {
       return;
     }
 
-    this.spellEntrySprites.forEach((sprite) => {
+    this.itemEntrySprites.forEach((sprite) => {
       this.removeChild(sprite);
     });
-    this.spellEntrySprites = [];
+    this.itemEntrySprites = [];
 
     for (
       let y = this.cursorState.rowIndex;
-      y < this.cursorState.rowIndex + SPELLS_PER_ROW;
+      y < this.cursorState.rowIndex + 3;
       y++
     ) {
-      if (y >= this.spellEntries.length) {
+      if (y >= this.itemEntries.length) {
         break;
       }
 
-      for (let x = 0; x < SPELLS_PER_ROW; x++) {
-        const entry = this.spellEntries[y][x];
+      for (let x = 0; x < 3; x++) {
+        const entry = this.itemEntries[y][x];
         if (entry === null) {
           continue;
         }
 
-        let spellName: string = entry;
-        while (spellName.length < MAX_ITEMNAME_LENGTH) {
-          spellName = spellName + " ";
+        let entryName = entry[0];
+        while (entryName.length < MAX_ITEMNAME_LENGTH) {
+          entryName = entryName + " ";
         }
 
-        let spellCost = SPELL_INFO[entry].mpCost.toString();
-        if (spellCost.length === 1) {
-          spellCost = " " + spellCost;
-        }
-
-        const entryText = new PIXI.Text(
-          `${spellName} ${spellCost}`,
-          TEXT_STYLE
-        );
+        const entryText = new PIXI.Text(`${entryName} ${entry[1]}`, TEXT_STYLE);
         entryText.x = 16 + x * 96;
         entryText.y = 8 + (y - this.cursorState.rowIndex) * 16;
         this.addChild(entryText);
-        this.spellEntrySprites.push(entryText);
+        this.itemEntrySprites.push(entryText);
       }
     }
   }
@@ -137,14 +127,14 @@ export default class SpellMenu extends UiBox implements IMenu {
     }
 
     if (game.input.isPressed(InputKey.SELECT)) {
-      // Cast spell!
+      // Use item!
       this.goBack(game);
       return;
     }
 
     const { x, y, rowIndex } = this.cursorState;
     if (game.input.isPressed(InputKey.RIGHT)) {
-      this.cursorState.x = Math.min(x + 1, SPELLS_PER_ROW - 1);
+      this.cursorState.x = Math.min(x + 1, 2);
     } else if (game.input.isPressed(InputKey.LEFT)) {
       this.cursorState.x = Math.max(x - 1, 0);
     } else if (game.input.isPressed(InputKey.UP)) {
@@ -153,19 +143,16 @@ export default class SpellMenu extends UiBox implements IMenu {
         this.cursorState.rowIndex--;
       }
     } else if (game.input.isPressed(InputKey.DOWN)) {
-      this.cursorState.y = Math.min(y + 1, SPELLS_PER_ROW - 1);
-      if (
-        y === SPELLS_PER_ROW - 1 &&
-        rowIndex + SPELLS_PER_ROW < this.spellEntries.length
-      ) {
+      this.cursorState.y = Math.min(y + 1, 2);
+      if (y === 2 && rowIndex + 3 < this.itemEntries.length) {
         this.cursorState.rowIndex++;
       }
     }
 
     if (
       this.cursorState.rowIndex + this.cursorState.y >=
-        this.spellEntries.length ||
-      this.spellEntries[this.cursorState.rowIndex + this.cursorState.y][
+        this.itemEntries.length ||
+      this.itemEntries[this.cursorState.rowIndex + this.cursorState.y][
         this.cursorState.x
       ] === null
     ) {

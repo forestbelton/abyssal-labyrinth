@@ -1,9 +1,9 @@
 import * as PIXI from "pixi.js";
 
-import { Mob } from "../data/mob";
-import UiBox from "./UiBox";
-import { ResourceBar } from "./ResourceBar";
-import { COLOR_HP, COLOR_MP } from "../constant";
+import { Mob } from "../../data/mob";
+import UiBox from "../util/UiBox";
+import { ResourceBar } from "../util/ResourceBar";
+import { COLOR_HP, COLOR_MP } from "../../constant";
 
 export default class EnemyContainer extends UiBox {
   enemy: Mob;
@@ -43,7 +43,5 @@ export default class EnemyContainer extends UiBox {
         ? 1
         : this.enemy.curMp / this.enemy.stats.maxMp;
     this.manaBar.update(manaBarScale);
-
-    console.log(healthBarScale, manaBarScale);
   }
 }

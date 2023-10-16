@@ -1,9 +1,9 @@
 import * as PIXI from "pixi.js";
-import { COLOR_HP, COLOR_MP, TEXT_STYLE } from "../constant";
-import { ResourceBar } from "./ResourceBar";
-import UiBox, { UIBOX_PADDING_HORIZ, UIBOX_PADDING_VERT } from "./UiBox";
-import { leftPad } from "../util";
-import { Player } from "../data/player";
+import { COLOR_HP, COLOR_MP, TEXT_STYLE } from "../../constant";
+import { ResourceBar } from "../util/ResourceBar";
+import UiBox, { UIBOX_PADDING_HORIZ, UIBOX_PADDING_VERT } from "../util/UiBox";
+import { leftPad } from "../../util";
+import { Player } from "../../data/player";
 
 const RESOURCE_BAR_LENGTH = 74;
 

@@ -9,14 +9,15 @@ import {
   FONT_BOLD,
   TEXT_STYLE,
 } from "./constant";
-import ActionMenu from "./component/ActionMenu";
-import EnemyContainer from "./component/EnemyContainer";
-import UiBox from "./component/UiBox";
+import ActionMenu from "./component/battle/menu/ActionMenu";
+import EnemyContainer from "./component/battle/EnemyContainer";
+import UiBox from "./component/util/UiBox";
 import { MOB_INFO, Mob } from "./data/mob";
 import { InputKey, InputState } from "./input";
-import IMenu from "./component/menu/IMenu";
-import { PlayerContainer } from "./component/PlayerContainer";
+import IMenu from "./component/util/IMenu";
+import { PlayerContainer } from "./component/battle/PlayerContainer";
 import { Player } from "./data/player";
+import { LogContainer } from "./component/battle/LogContainer";
 
 export enum GameState {
   TITLE,
@@ -32,12 +33,13 @@ export class Game {
   timers: any[];
   bgm?: string;
   actionMenu?: ActionMenu;
+  log?: LogContainer;
   subMenu: IMenu | null;
 
   // game state
   bg?: string;
   player?: Player;
-  enemy?: any;
+  enemy?: Mob;
 
   constructor(app: PIXI.Application, assets: Record<string, any>) {
     this.app = app;
@@ -217,10 +219,20 @@ export class Game {
     const bg = new PIXI.Sprite(this.assets[`BG_${this.bg}`]);
     this.screen.addChild(bg);
 
+    // Draw log
+    this.log = new LogContainer();
+    this.log.x = 8;
+    this.log.y = 8;
+    this.screen.addChild(this.log);
+
+    if (typeof this.enemy === "undefined") {
+      return;
+    }
+
     // Draw enemy name
     const enemyNameBg = new UiBox(80, 15);
     enemyNameBg.x = (WIDTH - 80) / 2;
-    enemyNameBg.y = 60;
+    enemyNameBg.y = 64;
     const enemyName = new PIXI.Text(this.enemy.info.name, TEXT_STYLE);
     enemyName.x = 4;
     enemyName.y = 3;
@@ -233,19 +245,19 @@ export class Game {
       this.assets[this.enemy.info.assetId]
     );
     enemyBox.x = enemyNameBg.x;
-    enemyBox.y = 80;
+    enemyBox.y = 84;
     this.screen.addChild(enemyBox);
 
-    // Draw player
+    // Draw player info
     const playerBox = new PlayerContainer(this.player as Player);
     playerBox.x = 8;
-    playerBox.y = 60;
+    playerBox.y = 88;
     this.screen.addChild(playerBox);
 
     // Draw menu
     this.actionMenu = new ActionMenu();
     this.actionMenu.x = 98;
-    this.actionMenu.y = enemyBox.y + 100;
+    this.actionMenu.y = enemyBox.y + 96;
     this.screen.addChild(this.actionMenu);
   }
 }

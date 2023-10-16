@@ -17,8 +17,6 @@ export type SpellInfo<Name extends string> = {
   mpCost: number;
 };
 
-export type PlayerSpells = Set<SpellName>;
-
 export const SPELL_INFO: { [Name in SpellName]: SpellInfo<Name> } = {
   Spark: {
     name: "Spark",
