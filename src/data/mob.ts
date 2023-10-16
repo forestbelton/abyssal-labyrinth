@@ -1,21 +1,14 @@
-export type MobStats = {
-  maxHp: number;
-  maxMp: number;
-  strength: number;
-  intelligence: number;
-  vitality: number;
-  agility: number;
-};
+import { Combat, CombatStats } from "./combat";
 
 export type MobInfo = {
   assetId: string;
   name: string; // NB: Must be <= 9 chars
-  stats: MobStats;
+  stats: CombatStats;
 };
 
-export class Mob {
+export class Mob implements Combat {
   info: MobInfo;
-  stats: MobStats;
+  stats: CombatStats;
   curHp: number;
   curMp: number;
 
@@ -53,9 +46,3 @@ export const MOB_INFO: Record<string, MobInfo> = {
     },
   },
 };
-
-Object.keys(MOB_INFO).forEach((name) => {
-  if (name !== MOB_INFO[name].name) {
-    throw new Error(`Name of monster '${name}' does not match property`);
-  }
-});

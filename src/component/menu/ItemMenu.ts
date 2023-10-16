@@ -2,11 +2,11 @@ import * as PIXI from "pixi.js";
 import { sound } from "@pixi/sound";
 
 import { MAX_ITEMNAME_LENGTH, TEXT_STYLE, WIDTH } from "../../constant";
-import { ItemInventory } from "../../data/item";
 import { InputKey } from "../../input";
 import IMenu from "./IMenu";
 import UiBox from "../UiBox";
 import { Game } from "../../game";
+import { PlayerInventory } from "../../data/player";
 
 type ItemEntry = [string, number] | null;
 
@@ -22,7 +22,7 @@ export default class ItemMenu extends UiBox implements IMenu {
     rowIndex: number;
   } | null;
 
-  constructor(items: ItemInventory) {
+  constructor(items: PlayerInventory) {
     super(WIDTH - 20, 55);
 
     this.itemEntrySprites = [];

@@ -1,5 +1,9 @@
 import * as PIXI from "pixi.js";
 
+export const UIBOX_PADDING_HORIZ = 8;
+
+export const UIBOX_PADDING_VERT = 8;
+
 export default class UiBox extends PIXI.Container {
   constructor(w: number, h: number, r: number = 4) {
     super();

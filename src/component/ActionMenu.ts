@@ -7,6 +7,7 @@ import { InputKey } from "../input";
 import { Game } from "../game";
 import ItemMenu from "./menu/ItemMenu";
 import IMenu from "./menu/IMenu";
+import SpellMenu from "./menu/SpellMenu";
 
 export default class ActionMenu extends UiBox implements IMenu {
   cursorText: PIXI.Text;
@@ -55,8 +56,6 @@ export default class ActionMenu extends UiBox implements IMenu {
 
   update(game: Game) {
     if (game.input.isPressed(InputKey.SELECT)) {
-      console.log("BAZONGA!!!");
-
       sound.play("SFX_menu_select");
       switch (this.cursorIndex) {
         // ATTACK
@@ -67,13 +66,20 @@ export default class ActionMenu extends UiBox implements IMenu {
           if (game.actionMenu) {
             game.screen.removeChild(game.actionMenu);
           }
-          game.subMenu = new ItemMenu(game.playerItems);
+          game.subMenu = new ItemMenu(game.player?.items || {});
           game.subMenu.x = 10;
           game.subMenu.y = game.actionMenu?.y || 0;
           game.screen.addChild(game.subMenu);
           break;
         // CAST
         case 2:
+          if (game.actionMenu) {
+            game.screen.removeChild(game.actionMenu);
+          }
+          game.subMenu = new SpellMenu(game.player?.spells || new Set([]));
+          game.subMenu.x = 10;
+          game.subMenu.y = game.actionMenu?.y || 0;
+          game.screen.addChild(game.subMenu);
           break;
         // FLEE
         case 3:

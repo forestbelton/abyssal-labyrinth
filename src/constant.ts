@@ -16,3 +16,6 @@ export const TEXT_STYLE = new TextStyle({
 });
 
 export const MAX_ITEMNAME_LENGTH = 8;
+
+export const COLOR_HP = "#ff4757";
+export const COLOR_MP = "#3742fa";

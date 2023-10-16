@@ -2,12 +2,14 @@ import * as PIXI from "pixi.js";
 
 import { Mob } from "../data/mob";
 import UiBox from "./UiBox";
+import { ResourceBar } from "./ResourceBar";
+import { COLOR_HP, COLOR_MP } from "../constant";
 
 export default class EnemyContainer extends UiBox {
   enemy: Mob;
   sprite: PIXI.Sprite;
-  healthBar: PIXI.Graphics;
-  manaBar: PIXI.Graphics;
+  healthBar: ResourceBar;
+  manaBar: ResourceBar;
 
   constructor(enemy: Mob, spriteTexture: PIXI.Texture) {
     super(80, 90);
@@ -19,31 +21,29 @@ export default class EnemyContainer extends UiBox {
     this.sprite.y = 8;
     this.addChild(this.sprite);
 
-    this.healthBar = new PIXI.Graphics();
+    this.healthBar = new ResourceBar(64, COLOR_HP);
     this.healthBar.x = 8;
     this.healthBar.y = 8 + 64 + 8;
-    this.updateHealthBar();
-    this.addChild(this.healthBar);
 
-    this.manaBar = new PIXI.Graphics();
+    this.manaBar = new ResourceBar(64, COLOR_MP);
     this.manaBar.x = 8;
     this.manaBar.y = 8 + 64 + 8 + 3;
-    this.updateManaBar();
+
+    this.update();
+    this.addChild(this.healthBar);
     this.addChild(this.manaBar);
   }
 
-  updateHealthBar() {
-    const healthBarLength = Math.floor(
-      64 * (this.enemy.curHp / this.enemy.stats.maxHp)
-    );
-    this.healthBar.clear().lineStyle(2, "#ff4757").lineTo(healthBarLength, 0);
-  }
+  update() {
+    const healthBarScale = this.enemy.curHp / this.enemy.stats.maxHp;
+    this.healthBar.update(healthBarScale);
 
-  updateManaBar() {
-    const baseLength = Math.floor(
-      64 * (this.enemy.curMp / this.enemy.stats.maxMp)
-    );
-    const manaBarLength = baseLength > 0 ? baseLength : 64;
-    this.manaBar.clear().lineStyle(2, "#3742fa").lineTo(manaBarLength, 0);
+    const manaBarScale =
+      this.enemy.stats.maxMp === 0
+        ? 1
+        : this.enemy.curMp / this.enemy.stats.maxMp;
+    this.manaBar.update(manaBarScale);
+
+    console.log(healthBarScale, manaBarScale);
   }
 }

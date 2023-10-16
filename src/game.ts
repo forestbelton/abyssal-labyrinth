@@ -15,7 +15,8 @@ import UiBox from "./component/UiBox";
 import { MOB_INFO, Mob } from "./data/mob";
 import { InputKey, InputState } from "./input";
 import IMenu from "./component/menu/IMenu";
-import { ItemInventory } from "./data/item";
+import { PlayerContainer } from "./component/PlayerContainer";
+import { Player } from "./data/player";
 
 export enum GameState {
   TITLE,
@@ -35,8 +36,7 @@ export class Game {
 
   // game state
   bg?: string;
-  player?: any;
-  playerItems: ItemInventory;
+  player?: Player;
   enemy?: any;
 
   constructor(app: PIXI.Application, assets: Record<string, any>) {
@@ -49,7 +49,8 @@ export class Game {
     this.screen = new PIXI.Container();
     this.app.stage.addChild(this.screen);
 
-    this.playerItems = {
+    this.player = new Player();
+    this.player.items = {
       "Red Potn": 99,
       "Ora Potn": 99,
       "Yel Potn": 99,
@@ -65,6 +66,20 @@ export class Game {
       RunSword: 99,
       DrgSword: 99,
     };
+    this.player.spells = new Set([
+      "Spark",
+      "Jolt",
+      "Thunder",
+      "Ember",
+      "Burn",
+      "Fireball",
+      "Sprinkle",
+      "Rain",
+      "Flood",
+      "Cure",
+      "Heal",
+      "Big Heal",
+    ]);
 
     this.state = GameState.TITLE;
     this.select(GameState.TITLE);
@@ -220,6 +235,12 @@ export class Game {
     enemyBox.x = enemyNameBg.x;
     enemyBox.y = 80;
     this.screen.addChild(enemyBox);
+
+    // Draw player
+    const playerBox = new PlayerContainer(this.player as Player);
+    playerBox.x = 8;
+    playerBox.y = 60;
+    this.screen.addChild(playerBox);
 
     // Draw menu
     this.actionMenu = new ActionMenu();
