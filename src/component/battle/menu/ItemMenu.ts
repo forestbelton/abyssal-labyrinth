@@ -7,7 +7,7 @@ import IMenu from "../../util/IMenu";
 import UiBox from "../../util/UiBox";
 import { Game } from "../../../game";
 import { Player, PlayerInventory } from "../../../data/player";
-import { ITEM_INFO, ItemName } from "../../../data/item";
+import { ItemName } from "../../../data/item";
 
 type ItemEntry = [ItemName, number] | null;
 
