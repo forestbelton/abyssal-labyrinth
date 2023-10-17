@@ -21,11 +21,11 @@ export class Player implements Combat {
     this.level = 1;
     this.exp = 0;
 
-    this.curHp = 1;
-    this.curMp = 1;
+    this.curHp = 10;
+    this.curMp = 5;
     this.stats = {
-      maxHp: 1,
-      maxMp: 1,
+      maxHp: 10,
+      maxMp: 5,
       strength: 1,
       intelligence: 1,
       vitality: 1,

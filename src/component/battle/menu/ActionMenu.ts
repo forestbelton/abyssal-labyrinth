@@ -60,6 +60,7 @@ export default class ActionMenu extends UiBox implements IMenu {
       switch (this.cursorIndex) {
         // ATTACK
         case 0:
+          game.log?.addLogMessage("You attack but it does nothing!");
           break;
         // ITEM
         case 1:

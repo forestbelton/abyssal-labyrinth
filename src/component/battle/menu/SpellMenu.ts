@@ -7,7 +7,7 @@ import IMenu from "../../util/IMenu";
 import UiBox from "../../util/UiBox";
 import { Game } from "../../../game";
 import { SPELL_INFO, SpellName } from "../../../data/spell";
-import { PlayerSpells } from "../../../data/player";
+import { Player, PlayerSpells } from "../../../data/player";
 
 type SpellEntry = SpellName | null;
 
@@ -137,7 +137,37 @@ export default class SpellMenu extends UiBox implements IMenu {
     }
 
     if (game.input.isPressed(InputKey.SELECT)) {
-      // Cast spell!
+      const spellName =
+        this.spellEntries[this.cursorState.rowIndex + this.cursorState.y][
+          this.cursorState.x
+        ];
+      if (spellName === null) {
+        console.error("Tried to use a null spell");
+        return;
+      }
+
+      const player: Player = game.player as Player;
+      if (!player.spells.has(spellName)) {
+        console.error("Tried to cast spell player doesn't have");
+        return;
+      }
+
+      const spell = SPELL_INFO[spellName];
+      if (spell.mpCost > player.curMp) {
+        game.log?.addLogMessage(
+          "Not enough MP to cast ",
+          `$s:${spellName}`,
+          "!"
+        );
+        this.goBack(game);
+        return;
+      }
+
+      game.log?.addLogMessage("You cast ", `$s:${spellName}`, ".");
+      player.curMp -= spell.mpCost;
+
+      // TODO: Activate spell effect
+
       this.goBack(game);
       return;
     }

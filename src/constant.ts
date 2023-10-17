@@ -15,6 +15,24 @@ export const TEXT_STYLE = new TextStyle({
   fontSize: 10,
 });
 
+export const TEXT_STYLE_DISABLED = new TextStyle({
+  fill: "#ababab",
+  fontFamily: FONT,
+  fontSize: 10,
+});
+
+export const TEXT_STYLE_ITEM = new TextStyle({
+  fill: "#eccc68",
+  fontFamily: FONT,
+  fontSize: 10,
+});
+
+export const TEXT_STYLE_SPELL = new TextStyle({
+  fill: "#5352ed",
+  fontFamily: FONT,
+  fontSize: 10,
+});
+
 export const MAX_ITEMNAME_LENGTH = 8;
 
 export const COLOR_HP = "#ff4757";

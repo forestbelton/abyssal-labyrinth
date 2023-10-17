@@ -6,9 +6,10 @@ import { InputKey } from "../../../input";
 import IMenu from "../../util/IMenu";
 import UiBox from "../../util/UiBox";
 import { Game } from "../../../game";
-import { PlayerInventory } from "../../../data/player";
+import { Player, PlayerInventory } from "../../../data/player";
+import { ITEM_INFO, ItemName } from "../../../data/item";
 
-type ItemEntry = [string, number] | null;
+type ItemEntry = [ItemName, number] | null;
 
 type ItemEntryRow = [ItemEntry, ItemEntry, ItemEntry];
 
@@ -54,7 +55,7 @@ export default class ItemMenu extends UiBox implements IMenu {
     let row: ItemEntryRow = [null, null, null];
     let rowIndex = 0;
     for (let entry of Object.entries(items)) {
-      row[rowIndex++] = entry;
+      row[rowIndex++] = entry as [ItemName, number];
       if (rowIndex >= row.length) {
         entries.push(row);
         row = [null, null, null];
@@ -94,7 +95,7 @@ export default class ItemMenu extends UiBox implements IMenu {
           continue;
         }
 
-        let entryName = entry[0];
+        let entryName: string = entry[0];
         while (entryName.length < MAX_ITEMNAME_LENGTH) {
           entryName = entryName + " ";
         }
@@ -127,7 +128,27 @@ export default class ItemMenu extends UiBox implements IMenu {
     }
 
     if (game.input.isPressed(InputKey.SELECT)) {
-      // Use item!
+      const entry =
+        this.itemEntries[this.cursorState.rowIndex + this.cursorState.y][
+          this.cursorState.x
+        ];
+      if (entry === null) {
+        console.error("Tried to use a null item");
+        return;
+      }
+
+      const [itemName, _] = entry;
+      const player: Player = game.player as Player;
+
+      game.log?.addLogMessage("You use ", `$i:${itemName}`, ".");
+      if (typeof player.items[itemName] === "undefined") {
+        console.error("Tried to use an item not in inventory");
+        return;
+      }
+
+      // @ts-ignore
+      player.items[itemName]--;
+
       this.goBack(game);
       return;
     }

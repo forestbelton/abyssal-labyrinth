@@ -34,6 +34,7 @@ export class Game {
   bgm?: string;
   actionMenu?: ActionMenu;
   log?: LogContainer;
+  playerBox?: PlayerContainer;
   subMenu: IMenu | null;
 
   // game state
@@ -207,6 +208,8 @@ export class Game {
         }
         break;
       case GameState.GAME:
+        this.log?.update();
+        this.playerBox?.update(this.player as Player);
         if (this.subMenu) {
           this.subMenu.update(this);
           return;
@@ -230,12 +233,12 @@ export class Game {
     }
 
     // Draw enemy name
-    const enemyNameBg = new UiBox(80, 15);
+    const enemyNameBg = new UiBox(80, 22);
     enemyNameBg.x = (WIDTH - 80) / 2;
-    enemyNameBg.y = 64;
+    enemyNameBg.y = 59;
     const enemyName = new PIXI.Text(this.enemy.info.name, TEXT_STYLE);
-    enemyName.x = 4;
-    enemyName.y = 3;
+    enemyName.x = 8;
+    enemyName.y = 6;
     enemyNameBg.addChild(enemyName);
     this.screen.addChild(enemyNameBg);
 
@@ -249,10 +252,10 @@ export class Game {
     this.screen.addChild(enemyBox);
 
     // Draw player info
-    const playerBox = new PlayerContainer(this.player as Player);
-    playerBox.x = 8;
-    playerBox.y = 88;
-    this.screen.addChild(playerBox);
+    this.playerBox = new PlayerContainer(this.player as Player);
+    this.playerBox.x = 8;
+    this.playerBox.y = 89;
+    this.screen.addChild(this.playerBox);
 
     // Draw menu
     this.actionMenu = new ActionMenu();
