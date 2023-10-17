@@ -84,6 +84,7 @@ export default class ActionMenu extends UiBox implements IMenu {
           break;
         // FLEE
         case 3:
+          game.log?.addLogMessage("Can't escape...");
           break;
       }
       return;
