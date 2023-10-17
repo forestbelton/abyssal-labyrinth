@@ -163,7 +163,11 @@ export default class SpellMenu extends UiBox implements IMenu {
         return;
       }
 
-      game.log?.addLogMessage("You cast ", `$s:${spellName}`, ".");
+      game.log?.addLogMessage(
+        "You cast ",
+        `$s:${spellName}`,
+        ". It does nothing."
+      );
       player.curMp -= spell.mpCost;
 
       // TODO: Activate spell effect

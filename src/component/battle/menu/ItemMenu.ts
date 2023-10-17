@@ -140,7 +140,11 @@ export default class ItemMenu extends UiBox implements IMenu {
       const [itemName, _] = entry;
       const player: Player = game.player as Player;
 
-      game.log?.addLogMessage("You use ", `$i:${itemName}`, ".");
+      game.log?.addLogMessage(
+        "You use ",
+        `$i:${itemName}`,
+        ". It does nothing."
+      );
       if (typeof player.items[itemName] === "undefined") {
         console.error("Tried to use an item not in inventory");
         return;
