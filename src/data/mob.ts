@@ -45,4 +45,22 @@ export const MOB_INFO: Record<string, MobInfo> = {
       agility: 3,
     },
   },
+  Zombie: {
+    assetId: "MOB_ZOMBIE",
+    name: "Zombie",
+    stats: {
+      maxHp: 7,
+      maxMp: 0,
+      strength: 2,
+      intelligence: 0,
+      vitality: 2,
+      agility: 1,
+    },
+  },
+};
+
+export const getRandomMob = () => {
+  const mobNames = Object.keys(MOB_INFO);
+  const mobNameIndex = Math.floor(Math.random() * mobNames.length);
+  return new Mob(MOB_INFO[mobNames[mobNameIndex]]);
 };

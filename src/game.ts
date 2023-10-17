@@ -12,7 +12,7 @@ import {
 import ActionMenu from "./component/battle/menu/ActionMenu";
 import EnemyContainer from "./component/battle/EnemyContainer";
 import UiBox from "./component/util/UiBox";
-import { MOB_INFO, Mob } from "./data/mob";
+import { MOB_INFO, Mob, getRandomMob } from "./data/mob";
 import { InputKey, InputState } from "./input";
 import IMenu from "./component/util/IMenu";
 import { PlayerContainer } from "./component/battle/PlayerContainer";
@@ -168,7 +168,7 @@ export class Game {
       case GameState.GAME:
         // TODO: randomly select?
         this.bg = "FIELDS";
-        this.enemy = new Mob(MOB_INFO["Rat"]);
+        this.enemy = getRandomMob();
         this.playBgm("BGM_battle");
         this.startBattle();
         break;

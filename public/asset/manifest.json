@@ -18,6 +18,10 @@
         {
           "name": "MOB_RAT",
           "srcs": "asset/mob/rat.png"
+        },
+        {
+          "name": "MOB_ZOMBIE",
+          "srcs": "asset/mob/zombie.png"
         }
       ]
     }
