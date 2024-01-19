@@ -33,6 +33,12 @@ export const TEXT_STYLE_SPELL = new TextStyle({
   fontSize: 10,
 });
 
+export const TEXT_STYLE_MOB = new TextStyle({
+  fill: "#ff6b81",
+  fontFamily: FONT,
+  fontSize: 10,
+});
+
 export const MAX_ITEMNAME_LENGTH = 8;
 
 export const COLOR_HP = "#ff4757";

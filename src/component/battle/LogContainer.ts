@@ -3,6 +3,7 @@ import * as PIXI from "pixi.js";
 import {
   TEXT_STYLE,
   TEXT_STYLE_ITEM,
+  TEXT_STYLE_MOB,
   TEXT_STYLE_SPELL,
   WIDTH,
 } from "../../constant";
@@ -66,6 +67,9 @@ export class LogContainer extends UiBox {
     } else if (chunk.startsWith("$s:")) {
       start = 3;
       style = TEXT_STYLE_SPELL;
+    } else if (chunk.startsWith("$m:")) {
+      start = 3;
+      style = TEXT_STYLE_MOB;
     }
 
     const message = chunk.substring(start);

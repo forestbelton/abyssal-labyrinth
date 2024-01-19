@@ -14,11 +14,18 @@ export type ItemName =
   | "RunSword"
   | "DrgSword";
 
-export type ItemInfo<Name extends string> = {
+export type ItemWeaponAttributes = {
+  type: "weapon";
+  baseDamage: number;
+  damageModifier: number;
+};
+
+type BaseItemInfo<Name extends ItemName> = {
   name: Name;
 };
 
-export type ItemInventory = Partial<Record<ItemName, number>>;
+export type ItemInfo<Name extends ItemName> = BaseItemInfo<Name> &
+  (ItemWeaponAttributes | {});
 
 export const ITEM_INFO: { [Name in ItemName]: ItemInfo<Name> } = {
   "Red Potn": {
@@ -47,20 +54,32 @@ export const ITEM_INFO: { [Name in ItemName]: ItemInfo<Name> } = {
   },
   BroSword: {
     name: "BroSword",
+    baseDamage: 1,
+    damageModifier: 1,
   },
   IroSword: {
     name: "IroSword",
+    baseDamage: 2,
+    damageModifier: 2,
   },
   MitSword: {
     name: "MitSword",
+    baseDamage: 3,
+    damageModifier: 2,
   },
   AdaSword: {
     name: "AdaSword",
+    baseDamage: 4,
+    damageModifier: 3,
   },
   RunSword: {
     name: "RunSword",
+    baseDamage: 5,
+    damageModifier: 3,
   },
   DrgSword: {
     name: "DrgSword",
+    baseDamage: 6,
+    damageModifier: 4,
   },
 };

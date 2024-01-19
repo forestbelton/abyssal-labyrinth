@@ -12,7 +12,7 @@ import {
 import ActionMenu from "./component/battle/menu/ActionMenu";
 import EnemyContainer from "./component/battle/EnemyContainer";
 import UiBox from "./component/util/UiBox";
-import { MOB_INFO, Mob, getRandomMob } from "./data/mob";
+import { Mob, getRandomMob } from "./data/mob";
 import { InputKey, InputState } from "./input";
 import IMenu from "./component/util/IMenu";
 import { PlayerContainer } from "./component/battle/PlayerContainer";
@@ -36,6 +36,8 @@ export class Game {
   log?: LogContainer;
   playerBox?: PlayerContainer;
   subMenu: IMenu | null;
+
+  enemyContainer: EnemyContainer;
 
   // game state
   bg?: string;
@@ -86,6 +88,9 @@ export class Game {
 
     this.state = GameState.TITLE;
     this.select(GameState.TITLE);
+
+    // @ts-ignore
+    this.enemyContainer = null;
 
     window.addEventListener("resize", this.resize.bind(this));
   }
@@ -243,13 +248,10 @@ export class Game {
     this.screen.addChild(enemyNameBg);
 
     // Draw enemy
-    const enemyBox = new EnemyContainer(
-      this.enemy,
-      this.assets[this.enemy.info.assetId]
-    );
-    enemyBox.x = enemyNameBg.x;
-    enemyBox.y = 84;
-    this.screen.addChild(enemyBox);
+    this.enemyContainer = new EnemyContainer(this.enemy, this.assets);
+    this.enemyContainer.x = enemyNameBg.x;
+    this.enemyContainer.y = 84;
+    this.screen.addChild(this.enemyContainer);
 
     // Draw player info
     this.playerBox = new PlayerContainer(this.player as Player);
@@ -260,7 +262,7 @@ export class Game {
     // Draw menu
     this.actionMenu = new ActionMenu();
     this.actionMenu.x = 98;
-    this.actionMenu.y = enemyBox.y + 96;
+    this.actionMenu.y = this.enemyContainer.y + 96;
     this.screen.addChild(this.actionMenu);
   }
 }

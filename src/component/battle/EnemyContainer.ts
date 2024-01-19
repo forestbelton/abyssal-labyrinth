@@ -7,16 +7,19 @@ import { COLOR_HP, COLOR_MP } from "../../constant";
 
 export default class EnemyContainer extends UiBox {
   enemy: Mob;
+  enemyTextures: Record<string, any>;
+
   sprite: PIXI.Sprite;
   healthBar: ResourceBar;
   manaBar: ResourceBar;
 
-  constructor(enemy: Mob, spriteTexture: PIXI.Texture) {
+  constructor(enemy: Mob, enemyTextures: Record<string, any>) {
     super(80, 90);
 
     this.enemy = enemy;
+    this.enemyTextures = enemyTextures;
 
-    this.sprite = new PIXI.Sprite(spriteTexture);
+    this.sprite = new PIXI.Sprite(enemyTextures[this.enemy.info.assetId]);
     this.sprite.x = 8;
     this.sprite.y = 8;
     this.addChild(this.sprite);
@@ -34,7 +37,19 @@ export default class EnemyContainer extends UiBox {
     this.addChild(this.manaBar);
   }
 
-  update() {
+  update(enemy?: Mob) {
+    if (enemy) {
+      this.enemy = enemy;
+
+      this.sprite.destroy();
+      this.sprite = new PIXI.Sprite(
+        this.enemyTextures[this.enemy.info.assetId]
+      );
+      this.sprite.x = 8;
+      this.sprite.y = 8;
+      this.addChild(this.sprite);
+    }
+
     const healthBarScale = this.enemy.curHp / this.enemy.stats.maxHp;
     this.healthBar.update(healthBarScale);
 

@@ -8,6 +8,8 @@ import { Game } from "../../../game";
 import ItemMenu from "./ItemMenu";
 import IMenu from "../../util/IMenu";
 import SpellMenu from "./SpellMenu";
+import { getRandomMob } from "../../../data/mob";
+import { physAttack } from "../../../data/combat";
 
 export default class ActionMenu extends UiBox implements IMenu {
   cursorText: PIXI.Text;
@@ -60,7 +62,41 @@ export default class ActionMenu extends UiBox implements IMenu {
       switch (this.cursorIndex) {
         // ATTACK
         case 0:
-          game.log?.addLogMessage("You attack but it does nothing!");
+          if (!game.enemy || !game.player) {
+            return;
+          }
+
+          const result = game.player.attack(game.enemy);
+          const damage = Math.min(result.damage, game.enemy?.curHp || 0);
+
+          if (result.isMiss) {
+            game.log?.addLogMessage("You attack but it misses!");
+          } else if (result.isCriticalHit) {
+            game.log?.addLogMessage(`Critical! You hit for ${damage} damage.`);
+          } else {
+            game.log?.addLogMessage(`You hit for ${damage} damage.`);
+          }
+
+          game.enemy.curHp -= damage;
+          game.enemyContainer.update();
+
+          if (game.enemy.curHp <= 0) {
+            game.log?.addLogMessage(
+              "You kill the ",
+              `$m:${game.enemy.info.name}`,
+              "!"
+            );
+            game.enemy = getRandomMob();
+            game.enemyContainer.update(game.enemy);
+            game.log?.addLogMessage(
+              "A ",
+              `$m:${game.enemy.info.name}`,
+              " appears!"
+            );
+          } else {
+            
+          }
+
           break;
         // ITEM
         case 1:
